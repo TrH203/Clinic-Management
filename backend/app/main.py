@@ -4,7 +4,6 @@ from . import crud, models, schemas
 from .db import create_db_and_tables, engine
 from .routers import public, admin
 from .deps import get_db
-import uvicorn
 
 app = FastAPI(title="Clinic Management System API")
 
