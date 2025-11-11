@@ -8,7 +8,7 @@ interface Appointment {
   appointment_time: string;
 }
 
-const AppointmentList = () => {
+const AppointmentList = ({ onEdit }: { onEdit: (appointment: Appointment) => void }) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   useEffect(() => {
@@ -22,23 +22,48 @@ const AppointmentList = () => {
     });
   }, []);
 
+  const handleDelete = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa lịch hẹn này không?')) {
+      const token = localStorage.getItem('token');
+      axios.delete(`/api/admin/appointments/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(() => {
+        setAppointments(appointments.filter(a => a.id !== id));
+      });
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-xl font-bold">Appointments</h2>
-      <table className="table-auto">
-        <thead>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2">Doctor ID</th>
-            <th className="px-4 py-2">Patient ID</th>
-            <th className="px-4 py-2">Appointment Time</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Bác sĩ</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Bệnh nhân</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời gian hẹn</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {appointments.map((appointment) => (
             <tr key={appointment.id}>
-              <td className="border px-4 py-2">{appointment.doctor_id}</td>
-              <td className="border px-4 py-2">{appointment.patient_id}</td>
-              <td className="border px-4 py-2">{appointment.appointment_time}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{appointment.doctor_id}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{appointment.patient_id}</td>
+              <td className="px-6 py-4 whitespace-nowrap">{new Date(appointment.appointment_time).toLocaleString()}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                <button
+                  onClick={() => onEdit(appointment)}
+                  className="text-indigo-600 hover:text-indigo-900"
+                >
+                  Sửa
+                </button>
+                <button
+                  onClick={() => handleDelete(appointment.id)}
+                  className="text-red-600 hover:text-red-900"
+                >
+                  Xóa
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

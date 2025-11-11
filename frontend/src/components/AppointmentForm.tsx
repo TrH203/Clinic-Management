@@ -1,76 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const AppointmentForm = () => {
+const AppointmentForm = ({ appointment, onClose }: { appointment?: any, onClose: () => void }) => {
   const [doctorId, setDoctorId] = useState('');
   const [patientId, setPatientId] = useState('');
   const [appointmentTime, setAppointmentTime] = useState('');
+  const isEditing = !!appointment;
+
+  useEffect(() => {
+    if (isEditing) {
+      setDoctorId(appointment.doctor_id);
+      setPatientId(appointment.patient_id);
+      setAppointmentTime(new Date(appointment.appointment_time).toISOString().slice(0, 16));
+    }
+  }, [appointment, isEditing]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    axios.post('/api/admin/appointments/', {
+    const appointmentData = {
       doctor_id: parseInt(doctorId),
       patient_id: parseInt(patientId),
       appointment_time: appointmentTime,
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(() => {
-      // Reload the list of appointments
+    };
+
+    const request = isEditing
+      ? axios.put(`/api/admin/appointments/${appointment.id}`, appointmentData, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      : axios.post('/api/admin/appointments/', appointmentData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+    request.then(() => {
+      onClose();
+      window.location.reload();
     });
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Add Appointment</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="doctorId">
-            Doctor ID
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="doctorId"
-            type="number"
-            placeholder="Doctor ID"
-            value={doctorId}
-            onChange={(e) => setDoctorId(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="patientId">
-            Patient ID
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="patientId"
-            type="number"
-            placeholder="Patient ID"
-            value={patientId}
-            onChange={(e) => setPatientId(e.target.value)}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="appointmentTime">
-            Appointment Time
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="appointmentTime"
-            type="datetime-local"
-            value={appointmentTime}
-            onChange={(e) => setAppointmentTime(e.target.value)}
-          />
-        </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          type="submit"
-        >
-          Add Appointment
-        </button>
-      </form>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+      <div className="relative mx-auto p-6 border w-full max-w-lg shadow-lg rounded-md bg-white">
+        <h2 className="text-2xl font-bold mb-6">{isEditing ? 'Chỉnh sửa Lịch hẹn' : 'Thêm Lịch hẹn'}</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">ID Bác sĩ</label>
+            <input
+              type="number"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              value={doctorId}
+              onChange={(e) => setDoctorId(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">ID Bệnh nhân</label>
+            <input
+              type="number"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Thời gian hẹn</label>
+            <input
+              type="datetime-local"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              value={appointmentTime}
+              onChange={(e) => setAppointmentTime(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {isEditing ? 'Lưu thay đổi' : 'Thêm mới'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
