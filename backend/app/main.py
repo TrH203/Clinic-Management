@@ -1,12 +1,21 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+
 from sqlmodel import Session
 from . import crud, models, schemas
 from .db import create_db_and_tables, engine
 from .routers import public, admin
 from .deps import get_db
-import uvicorn
 
 app = FastAPI(title="Clinic Management System API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # hoặc ["*"] khi dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(public.router, prefix="", tags=["public"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])

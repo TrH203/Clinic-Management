@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 from typing import List
@@ -7,6 +7,7 @@ from .. import auth, crud, models, schemas
 from ..deps import get_db, get_current_user
 from ..core.config import settings
 from datetime import timedelta
+from datetime import date
 
 router = APIRouter()
 
@@ -48,6 +49,11 @@ def update_doctor(doctor_id: int, doctor: schemas.DoctorUpdate, db: Session = De
 @router.delete("/doctors/{doctor_id}", response_model=schemas.DoctorRead)
 def delete_doctor(doctor_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.delete_doctor(db=db, doctor_id=doctor_id)
+
+@router.get("/doctors/{doctor_id}/appointments/", response_model=List[schemas.AppointmentRead])
+def read_doctor_appointments(doctor_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
+    appointments = crud.get_appointments_by_doctor(db, doctor_id=doctor_id)
+    return appointments
 
 @router.post("/patients/", response_model=schemas.PatientRead)
 def create_patient(patient: schemas.PatientCreate, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
@@ -96,3 +102,21 @@ def update_appointment(appointment_id: int, appointment: schemas.AppointmentUpda
 @router.delete("/appointments/{appointment_id}", response_model=schemas.AppointmentRead)
 def delete_appointment(appointment_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.delete_appointment(db=db, appointment_id=appointment_id)
+
+@router.get("/statistics/", response_model=schemas.StatisticsRead)
+def read_statistics(
+    doctor_ids: List[int] = Query(None),
+    patient_ids: List[int] = Query(None),
+    start_date: date = None,
+    end_date: date = None,
+    db: Session = Depends(get_db),
+    current_user: models.Admin = Depends(get_current_user)
+):
+    stats = crud.get_statistics(
+        db,
+        doctor_ids=doctor_ids,
+        patient_ids=patient_ids,
+        start_date=start_date,
+        end_date=end_date
+    )
+    return stats

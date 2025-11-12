@@ -1,6 +1,8 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from . import models, schemas
 from passlib.context import CryptContext
+from datetime import date, timedelta
+from collections import defaultdict
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -75,6 +77,9 @@ def get_appointment(db: Session, appointment_id: int):
 def get_appointments(db: Session, skip: int = 0, limit: int = 100):
     return db.exec(select(models.Appointment).offset(skip).limit(limit)).all()
 
+def get_appointments_by_doctor(db: Session, doctor_id: int):
+    return db.exec(select(models.Appointment).where(models.Appointment.doctor_id == doctor_id)).all()
+
 def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
     db_appointment = models.Appointment(**appointment.dict())
     db.add(db_appointment)
@@ -111,3 +116,58 @@ def create_admin(db: Session, admin: schemas.AdminCreate):
     db.commit()
     db.refresh(db_admin)
     return db_admin
+
+def get_statistics(db: Session, doctor_ids: list[int] = None, patient_ids: list[int] = None, start_date: date = None, end_date: date = None):
+    query = select(models.Appointment).join(models.Patient)
+
+    if not start_date:
+        start_date = date.today().replace(day=1)
+    if not end_date:
+        end_date = date.today()
+
+    query = query.where(models.Appointment.appointment_time >= start_date, models.Appointment.appointment_time <= end_date)
+
+    if doctor_ids:
+        query = query.where(models.Appointment.doctor_id.in_(doctor_ids))
+    if patient_ids:
+        query = query.where(models.Appointment.patient_id.in_(patient_ids))
+
+    appointments = db.exec(query).all()
+
+    # Doctor Stats
+    doctor_stats_map = defaultdict(lambda: {'total_hours': 0, 'visit_count': 0})
+    for app in appointments:
+        d = app.appointment_time.date()
+        doctor_stats_map[d]['total_hours'] += 1
+        doctor_stats_map[d]['visit_count'] += 1
+
+    doctor_stats = [schemas.DoctorStats(date=d, **stats) for d, stats in doctor_stats_map.items()]
+
+    # Patient Trend
+    patient_trend_map = defaultdict(lambda: {'patient_count': set(), 'total_hours': 0})
+    for app in appointments:
+        d = app.appointment_time.date()
+        patient_trend_map[d]['patient_count'].add(app.patient_id)
+        patient_trend_map[d]['total_hours'] += 1
+
+    patient_trend = [
+        schemas.PatientTrend(date=d, patient_count=len(stats['patient_count']), total_hours=stats['total_hours'])
+        for d, stats in patient_trend_map.items()
+    ]
+
+    # Patient Visits
+    patient_visits_map = defaultdict(lambda: {'visit_count': 0, 'patient_name': ''})
+    for app in appointments:
+        patient_visits_map[app.patient_id]['visit_count'] += 1
+        patient_visits_map[app.patient_id]['patient_name'] = app.patient.name
+
+    patient_visits = [
+        schemas.PatientVisit(patient_name=stats['patient_name'], visit_count=stats['visit_count'])
+        for pid, stats in patient_visits_map.items()
+    ]
+
+    return schemas.StatisticsRead(
+        doctor_stats=doctor_stats,
+        patient_trend=patient_trend,
+        patient_visits=patient_visits,
+    )

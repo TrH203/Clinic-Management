@@ -4,20 +4,41 @@ import PatientForm from './PatientForm';
 
 const PatientManagement = () => {
   const [showForm, setShowForm] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+  const handleEdit = (patient: any) => {
+    setSelectedPatient(patient);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setSelectedPatient(null);
+  };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Patient Management</h1>
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Danh sách Bệnh nhân</h2>
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          onClick={() => setShowForm(!showForm)}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow"
+          onClick={() => {
+            setShowForm(true);
+            setSelectedPatient(null);
+          }}
         >
-          {showForm ? 'Hide Form' : 'Add Patient'}
+          Thêm Bệnh nhân
         </button>
       </div>
-      {showForm && <PatientForm />}
-      <PatientList />
+
+      {showForm && (
+        <PatientForm
+          patient={selectedPatient}
+          onClose={handleCloseForm}
+        />
+      )}
+
+      <PatientList onEdit={handleEdit} />
     </div>
   );
 };

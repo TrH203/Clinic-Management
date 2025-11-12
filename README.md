@@ -1,92 +1,40 @@
 # Clinic Management System
 
-This is a complete Clinic Management System with a FastAPI backend and a React frontend.
+This is a complete Clinic Management System with a FastAPI backend and a React frontend, fully containerized with Docker.
 
-## Project Structure
+## Running with Docker (Recommended)
 
-- `backend/`: Contains the FastAPI application.
-- `frontend/`: Contains the React application.
+This is the easiest way to get the application running.
 
-## Backend Setup (FastAPI)
+1.  **Prerequisites**: Make sure you have Docker and Docker Compose installed on your system.
 
-1.  **Navigate to the backend directory:**
+2.  **Build and Run**:
     ```bash
-    cd backend
+    docker-compose up --build
     ```
+    This command will build the Docker images for both the frontend and backend, and then start the containers.
 
-2.  **Create a virtual environment:**
-    ```bash
-    python -m venv venv
-    ```
+3.  **Access the Application**:
+    -   **Frontend**: Open your browser and navigate to `http://localhost`.
+    -   **Backend API**: The API is available at `http://localhost:8000`.
 
-3.  **Activate the virtual environment:**
-    -   **Windows:**
-        ```bash
-        venv\Scripts\activate
-        ```
-    -   **macOS/Linux:**
-        ```bash
-        source venv/bin/activate
-        ```
+## Manual Setup (Without Docker)
 
-4.  **Install the dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+If you prefer to run the application without Docker, follow these steps.
 
-5.  **Run the application:**
-    ```bash
-    uvicorn app.main:app --reload
-    ```
-    The application will be available at `http://127.0.0.1:8000`.
+### Backend Setup (FastAPI)
 
-## Frontend Setup (React)
+1.  **Navigate to the backend directory**: `cd backend`
+2.  **Create and activate a virtual environment**.
+3.  **Install dependencies**: `pip install -r requirements.txt`
+4.  **Run the application**: `uvicorn app.main:app --reload`
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
+### Frontend Setup (React)
 
-2.  **Install the dependencies:**
-    ```bash
-    npm install
-    ```
-    or
-    ```bash
-    yarn
-    ```
+1.  **Navigate to the frontend directory**: `cd frontend`
+2.  **Install dependencies**: `yarn install` or `npm install`
+3.  **Run the application**: `yarn dev` or `npm run dev`
 
-3.  **Run the application:**
-    ```bash
-    npm run dev
-    ```
-    or
-    ```bash
-    yarn dev
-    ```
-    The application will be available at `http://localhost:5173`.
+### Proxy Setup
 
-## Proxy Setup
-
-The frontend is configured to proxy API requests to the backend. In `frontend/vite.config.ts`, you can see the proxy configuration:
-
-```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
-})
-```
-
-This configuration forwards any request starting with `/api` to the backend server running on `http://127.0.0.1:8000`.
+The frontend development server is configured to proxy API requests from `/api` to the backend. This is defined in `frontend/vite.config.ts`.
