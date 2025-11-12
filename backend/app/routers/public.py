@@ -1,6 +1,12 @@
 from fastapi import APIRouter
+from .. import schemas
 
 router = APIRouter()
+
+@router.post("/consultations")
+def create_consultation(consultation: schemas.ConsultationCreate):
+    print(f"Received consultation request: {consultation}")
+    return {"message": "Consultation request received successfully"}
 
 @router.get("/news")
 def get_news():
