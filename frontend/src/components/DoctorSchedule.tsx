@@ -17,7 +17,7 @@ const DoctorSchedule = ({ doctorId }: { doctorId: number | null }) => {
     if (doctorId) {
       setLoading(true);
       const token = localStorage.getItem('token');
-      axios.get(`/api/admin/doctors/${doctorId}/appointments`, {
+      axios.get(`/api/admin/doctors/${doctorId}/appointments/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(response => {

@@ -50,7 +50,7 @@ const DoctorCalendar = () => {
   useEffect(() => {
     if (selectedDoctorId) {
       const token = localStorage.getItem('token');
-      axios.get(`/api/admin/doctors/${selectedDoctorId}/appointments`, {
+      axios.get(`/api/admin/doctors/${selectedDoctorId}/appointments/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(response => {
