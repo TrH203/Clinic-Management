@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 
 class DoctorBase(BaseModel):
@@ -65,5 +65,21 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
+class DoctorStats(BaseModel):
+    date: date
+    total_hours: int
+    visit_count: int
+
+class PatientTrend(BaseModel):
+    date: date
+    patient_count: int
+    total_hours: int
+
+class PatientVisit(BaseModel):
+    patient_name: str
+    visit_count: int
+
 class StatisticsRead(BaseModel):
-    total_hours: float
+    doctor_stats: List[DoctorStats]
+    patient_trend: List[PatientTrend]
+    patient_visits: List[PatientVisit]
