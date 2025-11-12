@@ -107,6 +107,8 @@ def delete_appointment(db: Session, appointment_id: int):
 def get_admin_by_username(db: Session, username: str):
     return db.exec(select(models.Admin).where(models.Admin.username == username)).first()
 
+from datetime import date
+
 def create_admin(db: Session, admin: schemas.AdminCreate):
     hashed_password = pwd_context.hash(admin.password)
     db_admin = models.Admin(username=admin.username, hashed_password=hashed_password)
@@ -114,3 +116,18 @@ def create_admin(db: Session, admin: schemas.AdminCreate):
     db.commit()
     db.refresh(db_admin)
     return db_admin
+
+def get_statistics(db: Session, doctor_id: int = None, patient_id: int = None, start_date: date = None, end_date: date = None):
+    query = select(models.Appointment)
+    if doctor_id:
+        query = query.where(models.Appointment.doctor_id == doctor_id)
+    if patient_id:
+        query = query.where(models.Appointment.patient_id == patient_id)
+    if start_date:
+        query = query.where(models.Appointment.appointment_time >= start_date)
+    if end_date:
+        query = query.where(models.Appointment.appointment_time <= end_date)
+
+    appointments = db.exec(query).all()
+    # Assuming each appointment is 1 hour
+    return len(appointments)

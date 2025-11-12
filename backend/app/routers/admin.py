@@ -98,6 +98,26 @@ def read_appointment(appointment_id: int, db: Session = Depends(get_db), current
 def update_appointment(appointment_id: int, appointment: schemas.AppointmentUpdate, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.update_appointment(db=db, appointment_id=appointment_id, appointment=appointment)
 
+from datetime import date
+
 @router.delete("/appointments/{appointment_id}", response_model=schemas.AppointmentRead)
 def delete_appointment(appointment_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.delete_appointment(db=db, appointment_id=appointment_id)
+
+@router.get("/statistics/", response_model=schemas.StatisticsRead)
+def read_statistics(
+    doctor_id: int = None,
+    patient_id: int = None,
+    start_date: date = None,
+    end_date: date = None,
+    db: Session = Depends(get_db),
+    current_user: models.Admin = Depends(get_current_user)
+):
+    total_hours = crud.get_statistics(
+        db,
+        doctor_id=doctor_id,
+        patient_id=patient_id,
+        start_date=start_date,
+        end_date=end_date
+    )
+    return {"total_hours": total_hours}

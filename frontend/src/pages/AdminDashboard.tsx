@@ -3,6 +3,7 @@ import DoctorManagement from '../components/DoctorManagement';
 import PatientManagement from '../components/PatientManagement';
 import AppointmentManagement from '../components/AppointmentManagement';
 import DoctorCalendar from '../components/DoctorCalendar';
+import StatisticsDashboard from '../components/StatisticsDashboard';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('doctors');
@@ -17,6 +18,8 @@ const AdminDashboard = () => {
         return <AppointmentManagement />;
       case 'doctor-schedule':
         return <DoctorCalendar />;
+      case 'statistics':
+        return <StatisticsDashboard />;
       default:
         return <DoctorManagement />;
     }
@@ -55,6 +58,12 @@ const AdminDashboard = () => {
             onClick={() => setActiveTab('doctor-schedule')}
           >
             Lịch Bác sĩ
+          </button>
+          <button
+            className={`py-4 px-6 text-lg font-medium ${activeTab === 'statistics' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('statistics')}
+          >
+            Thống kê
           </button>
         </div>
 
