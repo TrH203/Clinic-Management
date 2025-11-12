@@ -10,15 +10,15 @@ const mockServices = [
   },
   {
     id: 2,
-    name: 'Chăm sóc Tim mạch',
-    description: 'Chăm sóc chuyên biệt cho sức khỏe tim mạch, bao gồm chẩn đoán và điều trị.',
+    name: 'Phục hồi sau phẩu thuật',
+    description: 'Chuyên phục hồi chức năng cho người sau khi phẩu thuật',
     icon: '❤️',
   },
   {
     id: 3,
-    name: 'Khám nhi',
-    description: 'Chăm sóc sức khỏe toàn diện cho trẻ sơ sinh, trẻ em và thanh thiếu niên.',
-    icon: '👶',
+    name: 'Phục hồi sau chấn thương',
+    description: 'Chuyên phục hồi chức năng cho người sau chấn thương',
+    icon: '💎',
   },
 ];
 
