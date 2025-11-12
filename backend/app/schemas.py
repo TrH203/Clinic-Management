@@ -83,3 +83,8 @@ class StatisticsRead(BaseModel):
     doctor_stats: List[DoctorStats]
     patient_trend: List[PatientTrend]
     patient_visits: List[PatientVisit]
+
+class ConsultationCreate(BaseModel):
+    name: str
+    age: int
+    phone: str
