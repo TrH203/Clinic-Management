@@ -66,6 +66,11 @@ const AppointmentForm = ({ appointment, onClose }: { appointment?: any, onClose:
     });
   };
 
+  const handleDoctorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedDoctorId = parseInt(e.target.value);
+    setDoctorId(isNaN(selectedDoctorId) ? null : selectedDoctorId);
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
       <div className="relative mx-auto p-6 border w-full max-w-lg shadow-lg rounded-md bg-white">
@@ -76,7 +81,7 @@ const AppointmentForm = ({ appointment, onClose }: { appointment?: any, onClose:
             <select
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               value={doctorId || ''}
-              onChange={(e) => setDoctorId(parseInt(e.target.value))}
+              onChange={handleDoctorChange}
               required
             >
               <option value="">Chọn bác sĩ</option>
