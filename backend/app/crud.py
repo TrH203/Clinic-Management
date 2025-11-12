@@ -75,6 +75,9 @@ def get_appointment(db: Session, appointment_id: int):
 def get_appointments(db: Session, skip: int = 0, limit: int = 100):
     return db.exec(select(models.Appointment).offset(skip).limit(limit)).all()
 
+def get_appointments_by_doctor(db: Session, doctor_id: int):
+    return db.exec(select(models.Appointment).where(models.Appointment.doctor_id == doctor_id)).all()
+
 def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
     db_appointment = models.Appointment(**appointment.dict())
     db.add(db_appointment)

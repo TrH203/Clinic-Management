@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 
 class Doctor(SQLModel, table=True):
@@ -19,6 +19,8 @@ class Patient(SQLModel, table=True):
     image_url: Optional[str] = None
     notes: Optional[str] = None
 
+    appointments: List["Appointment"] = Relationship(back_populates="patient")
+
 
 class Appointment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -26,6 +28,8 @@ class Appointment(SQLModel, table=True):
     patient_id: int = Field(foreign_key="patient.id")
     appointment_time: datetime
     notes: Optional[str] = None
+
+    patient: Patient = Relationship(back_populates="appointments")
 
 class Admin(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

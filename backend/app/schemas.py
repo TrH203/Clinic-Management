@@ -47,6 +47,7 @@ class AppointmentUpdate(AppointmentBase):
 
 class AppointmentRead(AppointmentBase):
     id: int
+    patient: "PatientRead"
 
 class AdminBase(BaseModel):
     username: str

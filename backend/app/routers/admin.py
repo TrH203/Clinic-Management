@@ -49,6 +49,11 @@ def update_doctor(doctor_id: int, doctor: schemas.DoctorUpdate, db: Session = De
 def delete_doctor(doctor_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.delete_doctor(db=db, doctor_id=doctor_id)
 
+@router.get("/doctors/{doctor_id}/appointments/", response_model=List[schemas.AppointmentRead])
+def read_doctor_appointments(doctor_id: int, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
+    appointments = crud.get_appointments_by_doctor(db, doctor_id=doctor_id)
+    return appointments
+
 @router.post("/patients/", response_model=schemas.PatientRead)
 def create_patient(patient: schemas.PatientCreate, db: Session = Depends(get_db), current_user: models.Admin = Depends(get_current_user)):
     return crud.create_patient(db=db, patient=patient)

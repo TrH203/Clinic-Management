@@ -2,6 +2,7 @@ import { useState } from 'react';
 import DoctorManagement from '../components/DoctorManagement';
 import PatientManagement from '../components/PatientManagement';
 import AppointmentManagement from '../components/AppointmentManagement';
+import DoctorCalendar from '../components/DoctorCalendar';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('doctors');
@@ -14,6 +15,8 @@ const AdminDashboard = () => {
         return <PatientManagement />;
       case 'appointments':
         return <AppointmentManagement />;
+      case 'doctor-schedule':
+        return <DoctorCalendar />;
       default:
         return <DoctorManagement />;
     }
@@ -46,6 +49,12 @@ const AdminDashboard = () => {
             onClick={() => setActiveTab('appointments')}
           >
             Quản lý Lịch hẹn
+          </button>
+          <button
+            className={`py-4 px-6 text-lg font-medium ${activeTab === 'doctor-schedule' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActiveTab('doctor-schedule')}
+          >
+            Lịch Bác sĩ
           </button>
         </div>
 
