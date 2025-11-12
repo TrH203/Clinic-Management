@@ -1,23 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Select from 'react-select';
+import Select, { type MultiValue } from 'react-select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
-interface Doctor {
-  id: number;
-  name: string;
-}
-
-interface Patient {
-  id: number;
-  name: string;
+interface SelectOption {
+  value: number;
+  label: string;
 }
 
 const StatisticsDashboard = () => {
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedDoctors, setSelectedDoctors] = useState<any[]>([]);
-  const [selectedPatients, setSelectedPatients] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<SelectOption[]>([]);
+  const [patients, setPatients] = useState<SelectOption[]>([]);
+  const [selectedDoctors, setSelectedDoctors] = useState<MultiValue<SelectOption>>([]);
+  const [selectedPatients, setSelectedPatients] = useState<MultiValue<SelectOption>>([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [stats, setStats] = useState<any>({ doctor_stats: [], patient_trend: [], patient_visits: [] });
@@ -25,16 +20,16 @@ const StatisticsDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('/api/admin/doctors/', { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => setDoctors(res.data.map(d => ({ value: d.id, label: d.name }))));
+      .then(res => setDoctors(res.data.map((d: { id: number, name: string }) => ({ value: d.id, label: d.name }))));
     axios.get('/api/admin/patients/', { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => setPatients(res.data.map(p => ({ value: p.id, label: p.name }))));
+      .then(res => setPatients(res.data.map((p: { id: number, name: string }) => ({ value: p.id, label: p.name }))));
   }, []);
 
   const handleFetchStatistics = () => {
     const token = localStorage.getItem('token');
     const params = new URLSearchParams();
-    selectedDoctors.forEach(d => params.append('doctor_ids', d.value));
-    selectedPatients.forEach(p => params.append('patient_ids', p.value));
+    selectedDoctors.forEach(d => params.append('doctor_ids', d.value.toString()));
+    selectedPatients.forEach(p => params.append('patient_ids', p.value.toString()));
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
 
